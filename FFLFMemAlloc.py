@@ -259,7 +259,7 @@ class FreeList:
         return (a,b)
 
     def __sortedMerge(self,a,b):
-        #recursive implementation, not really suitable for production
+        #recursive implementation, not suitable for production
         temp = None
 
         if not a:

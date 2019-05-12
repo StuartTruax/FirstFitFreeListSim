@@ -18,7 +18,7 @@ class TestClass(object):
 
         assert address0==0
 
-        assert str(fl) == "[ 0,32,False ]->[ 32,992,True ]->"
+        assert str(fl) == "[ 32,992,True ]->[ 0,32,False ]->"
 
 
     def test_geometric_alloc_dealloc(self):
@@ -141,15 +141,21 @@ class TestClass(object):
         assert str(fl) == "[ 0,768,True ]->[ 768,256,False ]->"
 
 
+    def test_mid_free(self):
 
-######FreeList Test Cases################
-#    plt.imshow(fl.asMatrix())
-#    plt.gray()
-#    plt.show()
-#    print(str(fl))
+        fl = FreeList(1024,32)
 
+        break_size = 32
 
+        N = 1024/32
 
-#    plt.imshow(fl.asMatrix())
-#    plt.gray()
-#    plt.show()
+        allocated_addresses = []
+
+        for i in range(0,N):
+            allocated_addresses.append(fl.malloc(break_size))
+
+        assert fl.free(allocated_addresses[N/2])
+
+        assert np.array_equal(fl.asMatrix(), np.matrix([[0, 0, 0, 0, 0, 0], \
+         [0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 1, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0]\
+         ,[0, 0, 1, 1, 1, 1]]))
