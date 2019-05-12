@@ -10,6 +10,10 @@ __Summary__: This is some python code that simulates the behavior of the C libra
 `free` - Freeing blocks of memory means updating the record for the freed block and also _merging_ the newly freed blocks with any contiguous blocks that might also be free. This operation is known as __coalescence__ [1]. This means that, again, a search is performed upon every invocation of `free`.
 
 
+## Simulation: Memory Allocation under Random Requests
+
+In `FirstFitFreeListSim.ipynb`, random amounts of memory are requested, allocated and randomly freed in the simulation loop. The animation shows the heap, with the allocated memory blocks being black and the free blocks being white.
+
 ![alt text](sim.png)
 
 ### Further Reading:
@@ -32,8 +36,3 @@ Python 2.7
 `matplotlib`
 
 `numpy`
-
-
-## Simulation: Memory Allocation under Random Requests
-
-Random amounts of memory will be requested, allocated and possibly freed in the below simulation loop. The animation shows the heap. The allocated memory blocks are black and the free blocks are white.
