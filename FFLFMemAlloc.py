@@ -131,10 +131,19 @@ class FreeList:
         if not node:
             return None
 
-        if node.size >= minSize and node.free:
-            return node
-        else:
-            return self.__findMemBlock(node.next, minSize)
+        cur = node
+
+        while cur:
+            if cur.size >= minSize and cur.free:
+                return cur
+            cur = cur.next
+
+        return None
+
+        #if node.size >= minSize and node.free:
+        #    return node
+        #else:
+        #    return self.__findMemBlock(node.next, minSize)
 
 
     def free(self, address):
@@ -259,8 +268,9 @@ class FreeList:
         return (a,b)
 
     def __sortedMerge(self,a,b):
-        #recursive implementation, not suitable for production
+
         temp = None
+        retHead = None
 
         if not a:
             return b
@@ -268,15 +278,48 @@ class FreeList:
         if not b:
             return a
 
-        if a.val <= b.val:
-            temp  = a
-            temp.next = self.__sortedMerge(a.next, b)
+        while a and b:
+            if a.val <= b.val:
+                if temp:
+                    temp.next = a
+                    temp = temp.next
+                else:
+                    temp  = a
+                    retHead = temp
+                a = a.next
+                temp.next = None
+            else:
+                if temp:
+                    temp.next = b
+                    temp = temp.next
+                else:
+                    temp  = b
+                    retHead = temp
+                b = b.next
+                temp.next = None
 
-        else:
-            temp = b
-            temp.next = self.__sortedMerge(a, b.next)
 
-        return temp
+        while a:
+            if temp:
+                temp.next = a
+                temp = temp.next
+            else:
+                temp  = a
+            a = a.next
+            temp.next = None
+
+
+        while b:
+            if temp:
+                temp.next = b
+                temp = temp.next
+            else:
+                temp  = b
+            b = b.next
+            temp.next = None
+
+        return retHead
+
 
 
 

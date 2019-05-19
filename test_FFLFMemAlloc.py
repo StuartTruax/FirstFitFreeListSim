@@ -9,6 +9,9 @@ class TestClass(object):
 
 
     def test_nibble_request(self):
+        """
+        bite a nibble off.
+        """
 
         fl = FreeList(1024,4)
 
@@ -22,6 +25,10 @@ class TestClass(object):
 
 
     def test_geometric_alloc_dealloc(self):
+        """
+        allocate geometrically as (512 K)*1/(2^i) i=0,...
+        and then free in reverse order
+        """
 
         fl = FreeList(1024,4)
 
@@ -39,6 +46,13 @@ class TestClass(object):
             assert fl.free(addresses[i])
 
     def test_pre_merge1(self):
+        """
+        pre_merge
+        |512|256|256|
+        |XXX|XXX|XXX|
+        |XXX|000|XXX|
+        |XXX|0000000|
+        """
 
         fl = FreeList(1024,256)
 
@@ -53,7 +67,6 @@ class TestClass(object):
         address1 = fl.malloc(break_size)
 
         assert address1 == 512
-
 
         break_size = 256
 
@@ -74,6 +87,13 @@ class TestClass(object):
 
 
     def test_pre_merge2(self):
+        """
+        pre_merge
+        |512|256|256|
+        |XXX|XXX|XXX|
+        |000|XXX|XXX|
+        |0000000|XXX|
+        """
 
         fl = FreeList(1024,256)
 
@@ -88,7 +108,6 @@ class TestClass(object):
         address1 = fl.malloc(break_size)
 
         assert address1 == 512
-
 
         break_size = 256
 
@@ -108,6 +127,13 @@ class TestClass(object):
 
 
     def test_post_merge1(self):
+        """
+        post_merge
+        |512|256|256|
+        |XXX|XXX|XXX|
+        |XXX|000|XXX|
+        |0000000|XXX|
+        """
 
         fl = FreeList(1024,256)
 
@@ -142,6 +168,10 @@ class TestClass(object):
 
 
     def test_mid_free(self):
+        """
+        1024-sized heap, allocated in 32-sized blocks
+        free the middle block
+        """
 
         fl = FreeList(1024,32)
 
@@ -159,3 +189,55 @@ class TestClass(object):
         assert np.array_equal(fl.asMatrix(), np.matrix([[0, 0, 0, 0, 0, 0], \
          [0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 1, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0]\
          ,[0, 0, 1, 1, 1, 1]]))
+
+
+    def test_allocate_free_allocate(self):
+        """
+        allocate, free, then allocate again
+        """
+
+        fl = FreeList(1024,256)
+
+        break_size = 512
+
+        address0 = fl.malloc(break_size)
+
+        assert address0 == 0
+
+        assert np.array_equal(fl.asMatrix(), np.matrix([[0, 0],[1, 1]]))
+
+        assert str(fl) == "[ 512,512,True ]->[ 0,512,False ]->"
+
+        assert fl.free(address0)
+
+        address0 = fl.malloc(break_size)
+
+        assert address0 == 0
+
+
+    def test_allocate_free_allocate(self):
+        """
+        1024-sized heap, allocated in 32-sized blocks
+        free the middle block
+        """
+
+        fl = FreeList(1024,32)
+
+        break_size = 32
+
+        N = 1024/32
+
+        allocated_addresses = []
+
+        for i in range(0,N):
+            allocated_addresses.append(fl.malloc(break_size))
+
+        assert fl.free(allocated_addresses[N/2])
+
+        assert np.array_equal(fl.asMatrix(), np.matrix([[0, 0, 0, 0, 0, 0], \
+             [0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 1, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0]\
+             ,[0, 0, 1, 1, 1, 1]]))
+
+        after_free_address = fl.malloc(break_size)
+
+        assert after_free_address
